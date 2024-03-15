@@ -1,10 +1,32 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { create } from 'zustand'
+
+interface CounterState {
+  state: {
+    counter: number
+  }
+  setState: (props: Partial<CounterState['state']> | ((s: Partial<CounterState['state']>) => Partial<CounterState['state']>)) => void
+}
+
+export const useStore = create<CounterState>()((set) => ({
+  state: {
+    counter: 0
+  },
+  setState: (props) => {
+    if (typeof props === 'object'){
+      return set((s) => ({ state: { ...s.state, ...props } }));
+    }
+
+    if (typeof props === 'function') {
+      return set((s) => ({ state: { ...s.state, ...(props(s.state)) } }));
+    }
+  },
+}));
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {state, setState} = useStore()
 
   return (
     <>
@@ -18,8 +40,13 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button 
+          onClick={() => {
+            setState({counter: state.counter + 1})
+            setState(s => ({counter: Number(s.counter) + 1}))
+          }}
+        >
+          count is {state.counter}
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
