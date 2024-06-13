@@ -3,14 +3,18 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { create } from 'zustand'
 
-interface CounterState {
-  state: {
-    counter: number
-  }
-  setState: (props: Partial<CounterState['state']> | ((s: Partial<CounterState['state']>) => Partial<CounterState['state']>)) => void
+export type SetState<T> = (props: Partial<T> | ((s: Partial<T>) => Partial<T>)) => void
+
+interface State {
+  counter: number
 }
 
-export const useStore = create<CounterState>()((set) => ({
+interface Counter {
+  state: State
+  setState: SetState<State>
+}
+
+export const useStore = create<Counter>()((set) => ({
   state: {
     counter: 0
   },
